@@ -1,0 +1,265 @@
+FORMAT: 1A
+HOST: http://polls.apiblueprint.org/
+
+# 3dp-gallery-api
+
+APIs for 3D Printer Gallery Web Apps
+
+
+## Login [/auth]
+
+Login to the system.
+
+### Login [GET]
+
+
+<!--
+    @.id(String) - User ID
+    @.password(String) - Password
+-->
+
+<!--
+        + result(boolean) - Login is result
+        + credential(String) - User Info Credential
+-->
+
++ Request (application/json)
+
+        {
+            id: "sample@example.com",
+            password: "password"
+        }
+
+
++ Response 200 (application/json)
+
+        {
+            "credential": "samplecredentialxxxxxxxxxxxxxx"
+        }
+
+
+## Get List [/list/{page}/{search}?sort={sortorder}]
+
+Get Gallery item list.
+
+### Getting List [GET]
+
++ Parameters
+
+    + page(required, String) - page number. the first number is 1.
+    + search(optional, String) - search text.
+    + sortorder(optional, String) - Sorting order parameter.
+
+
+* Response 200 (application/json)
+
+        [
+            {
+                "id": 12,
+                "name": "The first Project",
+                "explains": [
+                    {
+                        "key": "printer",
+                        "label": "Used Printer",
+                        "Value": "Printer1"
+                    }
+                ]
+            }
+        ]
+        
+
+## Gallery Item [/item/{item_id}]
+
+API for Gallery Item.
+
+### Get Gallery Item [GET]
+
++ Parameters
+
+    + item_id(required, String) - Item unique id
+    
+    
++ Response 200 (application/json)
+
+        {
+            "id": 12,
+            "name": "The first Project",
+            "explains": [
+                {
+                    "key": "printer",
+                    "label": "Used Printer",
+                    "Value": "Printer1"
+                }
+            ],
+            "images": [
+                {
+                    "name": "image1.png",
+                    "mimetype": "image/png",
+                    "url": "https://xxxxxxxxxx"
+                }
+            ],
+            "registered": "2017-01-01 10:00:00.000"
+        }
+        
+
+### Create/Update Gallery Item [POST]
+
++ Parameters
+
+    + item_id (Optional, String) - if updating gallery item, need to set unique id.
+
+
++ Request (application/json)
+
+        {
+            "name": "The first Project",
+            "explains": [
+                {
+                    "key": "printer",
+                    "Value": "Printer1"
+                }
+            ]
+        }
+        
++ Response 201 (application/json)
+
+        {
+            "id": 12
+        }
+        
+### Remove Gallery Item [DELETE]
+
++ Parameters
+
+    + item_id (Required, String) - Removing Item id
+    
+
++ Response 200 (application/json)
+
+        {
+            "id": 12,
+            "name": "The first project"
+        }
+
++ Response 409 (application/json)
+
+        {
+            "code": "DL-xxxxxx",
+            "message": "The Gallery Item is already removed."
+        }
+        
+
+## Galalley Item List [/image/{item_id}]
+
+### Get image list [GET]
+
++ Parameter 
+
+    + item_id (Required, Stirng) - Gallery Item Unique ID
+
++ Response 200 (application/json)
+
+        [{
+            "id": 1,
+            "name": "photo00000.png",
+            "thumbnail": "https://xxxxxxxxx/a.png",
+            "image": "https://xxxxxxxxx/a.png"
+        }]
+
+
+## Gallery Image Management [/image/{item_id}/{image_id}]
+
+### Upload Image [POST]
+
++ Parameter
+
+    + item_id (Required, String) - Gallery Item Unique ID
+    + image_id (Required, String) - Gallery Item Image Item Unique ID
+
++ Request (multipart/form-data; boundary=---BOUNDARY)
+
+        -----BOUNDARY
+        Content-Disposition: form-data; name="image[file]"; filename="image.jpg"
+        Content-Type: image/jpeg
+        Content-Transfer-Encoding: base64
+
+        /9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0a
+        HBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIy
+        MjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIA
+        AhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAf/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFAEB
+        AAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AL+AD//Z
+        -----BOUNDARY
+
++ Response 201 (application/json)
+
+        {
+            "image_id": 19
+        }
+        
++ Response 409 (application/json)
+
+        {
+            "code": "ATH-XXX",
+            "message": "Faild to upload. You don't have permission to upload to the item."
+        }
+
+### Delete Image [DELETE]
+
++ Parameter
+
+    + item_id (Required, String) - Gallery Item Unique ID
+    + image_id (Required, String) - Gallery Item Image Item Unique ID
+
++ Response 200 (application/json)
+        
+        {
+            "image_id": 19
+        }
+
++ Response 409 (application/json)
+
+        {
+            "code": "DL-xxxxxx",
+            "message": "The Gallery Item is already removed."
+        }
+        
+
+## Manage User Info [/user/{user_id}]
+
+Management User Information.
+
+### Get User Info [GET]
+
++ Parameters
+    + user_id (Required, String) - user id. if wanna get own info, set instead of 'my'
+
++ Response 200 (application/json)
+
+        {
+            "id": 1,
+            "user_name": "User Name"
+            "loginid": "loginuser@example.com",
+            "mail": "mail@example.com",
+            "administrator": true
+        }
+
+
+### Create / Update User [POST]
+
++ Parameters
+    + user_id (Optional, String) - user id. if wanna get own info, set instead of 'my'. set blank when creating user
+
++ Request (application/json)
+
+        {
+            "name": "Updating User Name."
+            "loginid": "loginuser@example.com",
+            "mail": "mail@example.com",
+            "administrator": true
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": 1
+        }
